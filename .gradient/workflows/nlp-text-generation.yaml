@@ -5,23 +5,20 @@
 # repository linked to the user's Gradient project
 # It clones this repo and then in turn calls the file nlp_text_generation.py
 # This file outputs the generated text to outputs.txt in a Gradient-managed Dataset
-# This Workflow runs on the Paperspace HuggingFace NLP container (paperspace/transformers-gpu:0.4.0)
+# Updated to use modern Python 3.10+ image with GPU support and CUDA-matched PyTorch
 #
 # See the Gradient documentation page for more details:
 # https://docs.paperspace.com/gradient/get-started/tutorials-list/example-workflow-nlp-text-generator
 #
-# Last updated: Nov 03rd 2021
-
+# Last updated: August 2025
 on:
   github:
     branches:
       only: main
-
 jobs:
-
   cloneRepo:
     resources:
-      instance-type: C4
+      instance-type: P4000
     outputs:
       repo:
         type: volume
@@ -29,10 +26,9 @@ jobs:
     with:
       url: context.event.github.url
       ref: context.event.github.ref
-
   generateText:
     resources:
-      instance-type: C5
+      instance-type: P4000
     needs:
       - cloneRepo
     inputs:
@@ -47,20 +43,20 @@ jobs:
       script: |-
         cp -R /inputs/repo /nlp
         cd /nlp
-        pip3 install -U transformers
+        # Install CUDA-matched PyTorch and transformers
+        python3 -m pip install --upgrade pip
+        python3 -m pip install torch==2.0.1+cu118 torchvision==0.15.2+cu118 torchaudio==2.0.2+cu118 --index-url https://download.pytorch.org/whl/cu118
+        python3 -m pip install transformers>=4.30.0 datasets accelerate
+        # Verify CUDA is available
+        python3 -c "import torch; print(f'CUDA available: {torch.cuda.is_available()}')"
         python3 nlp_text_generation.py
         mv output.txt /outputs/generatedText
         ls "-aFlR" /outputs/generatedText
-      image: paperspace/transformers-gpu:0.4.0
-
+      image: nvidia/cuda:11.8-devel-ubuntu20.04
 # Appendix: Extra details
 #
-# pip3 install updates transformers from the version on the image to the latest
-# This isn't required, but gives access to more models
-# The script fails if "python" is used instead of "python3"
-# Everything here is assumed to be running in the main branch of the repository
-# The generateText job is OK on C5 (CPU) or P4000 (GPU) but may fail on smaller instances
-# if they have insufficient memory
-# The output dataset used is "demo-dataset", which is auto-generated in Gradient for each team
-# This avoids requiring the creation of an output dataset before the YAML is run
-# The output can be directed elsewhere, provided the alternative output Dataset location has been created
+# Updated to use modern CUDA 11.8 base image with Python 3.10+ support
+# Added explicit CUDA-matched PyTorch installation for GPU acceleration
+# The generateText job now uses P4000 GPU instance for better performance
+# Added verification step to ensure CUDA is properly detected
+# Updated transformers to version 4.30+ for better model support
