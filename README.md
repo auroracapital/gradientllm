@@ -1,11 +1,9 @@
 # NLP-Text-Generation
-
 Last updated: Sep 29th 2021
 
 This is our GitHub repository for the Paperspace Gradient [NLP Text Generation Tutorial example](https://docs.paperspace.com/gradient/get-started/tutorials-list/example-workflow-nlp-text-generator). It runs the GPT-2 model from HuggingFace: https://huggingface.co/gpt2 .
 
 The example shows:
-
  - Text generation from a modern deep-learning-based natural language processing model, GPT-2
  - Gradient Projects linked to GitHub repositories
  - Gradient Workflows
@@ -61,3 +59,7 @@ If the resulting updated version of the `nlp_text_generation.py` file is uploade
 ## Next Steps
 
 See the [documentation page for this tutorial](https://docs.paperspace.com/gradient/get-started/tutorials-list/example-workflow-nlp-text-generator) for some suggested next steps (e.g., you can run the newer+larger GPT-Neo instead of GPT-2).
+
+---
+## Workflow Trigger: August 14, 2025
+Triggering workflow run to test CPU-safe configuration with C5 instances and distilgpt2 model.
